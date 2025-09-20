@@ -12,7 +12,13 @@ def load_state() -> Dict[str, List[Dict[str, Any]]]:
     _ensure_dir()
     if DATA_FILE.exists():
         try:
-            return json.loads(DATA_FILE.read_text(encoding="utf-8"))
+            state = json.loads(DATA_FILE.read_text(encoding="utf-8"))
+            evs = state.get("events", [])
+            for e in evs:
+                if "date" not in e:
+                    e["date"] = ""
+            state["events"] = evs
+            return state
         except Exception:
             pass
     return {"characters": [], "places": [], "events": []}

@@ -12,3 +12,4 @@ class Place:
 class Event:
     title: str
     description: str
+    date: str = ""

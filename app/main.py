@@ -5,12 +5,13 @@ from PySide6.QtWidgets import QApplication, QWidget, QTabWidget, QVBoxLayout, QM
 from .models import Character, Place, Event
 from .storage import load_state, save_state
 from .ui.tabs import ListTab, EventsTab
+from .ui.timeline import TimelineTab
 
 class MainWindow(QWidget):
     def __init__(self):
         super().__init__()
-        self.setWindowTitle("timeline – MVP")
-        self.resize(800, 550)
+        self.setWindowTitle("timeline – MVP with Timeline")
+        self.resize(900, 600)
 
         state = load_state()
         char_names = [c["name"] for c in state.get("characters", [])]
@@ -21,15 +22,17 @@ class MainWindow(QWidget):
         self.chars_tab = ListTab("Character", char_names)
         self.places_tab = ListTab("Place", place_names)
         self.events_tab = EventsTab(events)
+        self.timeline_tab = TimelineTab(self.events_tab.values)
 
         self.tabs.addTab(self.chars_tab, "Characters")
         self.tabs.addTab(self.places_tab, "Places")
         self.tabs.addTab(self.events_tab, "Events")
+        self.tabs.addTab(self.timeline_tab, "Timeline")
 
         layout = QVBoxLayout(self)
         layout.addWidget(self.tabs)
 
-    def closeEvent(self, event): 
+    def closeEvent(self, event):
         state = {
             "characters": [asdict(Character(name=n)) for n in self.chars_tab.values()],
             "places": [asdict(Place(name=n)) for n in self.places_tab.values()],
