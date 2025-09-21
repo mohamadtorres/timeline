@@ -10,8 +10,8 @@ from .ui.timeline import TimelineTab
 class MainWindow(QWidget):
     def __init__(self):
         super().__init__()
-        self.setWindowTitle("timeline – MVP with Timeline")
-        self.resize(900, 600)
+        self.setWindowTitle("timeline – MVP with Timeline & Links")
+        self.resize(1000, 650)
 
         state = load_state()
         char_names = [c["name"] for c in state.get("characters", [])]
@@ -21,8 +21,12 @@ class MainWindow(QWidget):
         self.tabs = QTabWidget()
         self.chars_tab = ListTab("Character", char_names)
         self.places_tab = ListTab("Place", place_names)
-        self.events_tab = EventsTab(events)
-        self.timeline_tab = TimelineTab(self.events_tab.values)
+
+        get_chars = self.chars_tab.values
+        get_places = self.places_tab.values
+
+        self.events_tab = EventsTab(events, get_characters_fn=get_chars, get_places_fn=get_places)
+        self.timeline_tab = TimelineTab(self.events_tab.values, get_characters_fn=get_chars, get_places_fn=get_places)
 
         self.tabs.addTab(self.chars_tab, "Characters")
         self.tabs.addTab(self.places_tab, "Places")

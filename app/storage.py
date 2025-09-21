@@ -17,6 +17,10 @@ def load_state() -> Dict[str, List[Dict[str, Any]]]:
             for e in evs:
                 if "date" not in e:
                     e["date"] = ""
+                if "characters" not in e or not isinstance(e["characters"], list):
+                    e["characters"] = []
+                if "place" not in e:
+                    e["place"] = ""
             state["events"] = evs
             return state
         except Exception:

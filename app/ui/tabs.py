@@ -1,10 +1,10 @@
 from __future__ import annotations
-from typing import List, Optional
-from PySide6.QtCore import QDate
+from typing import List, Optional, Callable
+from PySide6.QtCore import QDate, Qt
 from PySide6.QtWidgets import (
     QWidget, QVBoxLayout, QHBoxLayout,
     QListWidget, QListWidgetItem,
-    QLineEdit, QTextEdit, QPushButton, QLabel, QMessageBox, QDateEdit
+    QLineEdit, QTextEdit, QPushButton, QLabel, QMessageBox, QDateEdit, QComboBox
 )
 from ..models import Event
 
@@ -67,20 +67,28 @@ class ListTab(QWidget):
 
 class EventsTab(QWidget):
     """
-    Events med stöd för:
-    - Add
-    - Delete selected
-    - Dubbelklick på item => ladda in i formuläret (edit mode)
-    - Save Changes (uppdaterar valt item)
-    - Clear (avbryt redigering / töm formulär)
+    Events med:
+    - Add / Delete
+    - Dubbelklick => redigering (form fylls)
+    - Save Changes / Clear
+    - Välj flera Characters (multi-select) och en Place (dropdown)
     """
-    def __init__(self, initial_events: List[Event]):
+    def __init__(self, initial_events: List[Event],
+                 get_characters_fn: Callable[[], List[str]],
+                 get_places_fn: Callable[[], List[str]]):
         super().__init__()
+
+        self.get_characters_fn = get_characters_fn
+        self.get_places_fn = get_places_fn
 
         self.list = QListWidget()
         for ev in initial_events:
-            label = f"{(ev.date or '').strip()} | {ev.title} – {_shorten(ev.description)}".strip(" |")
-            self.list.addItem(QListWidgetItem(label))
+            item = QListWidgetItem(self._compose_label(ev))
+            item.setData(Qt.UserRole, {
+                "title": ev.title, "description": ev.description, "date": ev.date,
+                "characters": list(ev.characters or []), "place": ev.place or ""
+            })
+            self.list.addItem(item)
 
         self.title_input = QLineEdit()
         self.title_input.setPlaceholderText("Event title…")
@@ -93,6 +101,12 @@ class EventsTab(QWidget):
         self.date_input.setCalendarPopup(True)
         self.date_input.setDate(QDate.currentDate())
         self.date_input.setDisplayFormat("yyyy-MM-dd")
+
+        self.char_list = QListWidget()
+        self.char_list.setSelectionMode(QListWidget.MultiSelection)
+
+        self.place_combo = QComboBox()
+        self._refresh_char_place_choices()
 
         self.add_btn = QPushButton("Add Event")
         self.clear_btn = QPushButton("Clear")
@@ -112,6 +126,11 @@ class EventsTab(QWidget):
         form.addWidget(QLabel("Date"))
         form.addWidget(self.date_input)
 
+        form.addWidget(QLabel("Characters (select multiple):"))
+        form.addWidget(self.char_list)
+        form.addWidget(QLabel("Place:"))
+        form.addWidget(self.place_combo)
+
         buttons = QHBoxLayout()
         buttons.addWidget(self.add_btn)
         buttons.addWidget(self.clear_btn)
@@ -126,72 +145,108 @@ class EventsTab(QWidget):
         self._edit_row: Optional[int] = None
 
 
-    @staticmethod
-    def _compose_label(date: str, title: str, desc: str) -> str:
-        """Format we render to the list: 'YYYY-MM-DD | Title – Preview' (date can be empty)."""
-        left = date.strip()
-        preview = _shorten(desc.strip())
-        if left:
-            return f"{left} | {title.strip()} – {preview}"
-        return f"{title.strip()} – {preview}"
+    def _refresh_char_place_choices(self):
+        self.char_list.clear()
+        for name in self.get_characters_fn():
+            self.char_list.addItem(QListWidgetItem(name))
+        self.place_combo.clear()
+        self.place_combo.addItem("")
+        for p in self.get_places_fn():
+            self.place_combo.addItem(p)
 
     @staticmethod
-    def _split_label(label: str) -> tuple[str, str, str]:
-        """
-        Motsatsen till _compose_label. Returnerar (date, title, descPreview).
-        (descPreview är förkortad version, originaltexten har vi inte kvar i listan.)
-        """
-        date = ""
-        rest = label
-        if " | " in label:
-            date, rest = label.split(" | ", 1)
-        title = rest
-        desc = ""
-        if " – " in rest:
-            title, desc = rest.split(" – ", 1)
-        return date.strip(), title.strip(), desc.strip()
+    def _short_characters(chars: List[str]) -> str:
+        return ", ".join(chars) if chars else ""
 
-    def clear_form(self):
-        self.title_input.clear()
-        self.desc_input.clear()
-        self.date_input.setDate(QDate.currentDate())
-        self._edit_row = None
-        self.add_btn.setText("Add Event")
+    def _compose_label(self, ev: Event) -> str:
+        left = ev.date.strip() if ev.date else ""
+        base = f"{ev.title.strip()} – {_shorten(ev.description)}"
+        meta = []
+        if ev.place:
+            meta.append(ev.place)
+        if ev.characters:
+            meta.append(self._short_characters(ev.characters))
+        meta_str = (" (" + " • ".join(meta) + ")") if meta else ""
+        return f"{left + ' | ' if left else ''}{base}{meta_str}"
 
+    def _collect_form(self) -> Event:
+        title = self.title_input.text().strip()
+        desc = self.desc_input.toPlainText().strip()
+        date = self.date_input.date().toString("yyyy-MM-dd")
+        chars = [i.text() for i in self.char_list.selectedItems()]
+        place = self.place_combo.currentText().strip()
+        return Event(title=title, description=desc, date=date, characters=chars, place=place)
 
-    def load_for_edit(self, item: QListWidgetItem):
-        """Dubbelklick på list-item laddar formuläret för redigering."""
-        row = self.list.row(item)
-        date, title, desc_preview = self._split_label(item.text())
-        self.title_input.setText(title)
-        self.desc_input.setPlainText(desc_preview)
-        if date:
+    def _fill_form(self, ev: Event):
+        self.title_input.setText(ev.title)
+        self.desc_input.setPlainText(ev.description)
+        if ev.date:
             try:
-                y, m, d = [int(p) for p in date.split("-")]
+                y, m, d = [int(p) for p in ev.date.split("-")]
                 self.date_input.setDate(QDate(y, m, d))
             except Exception:
                 self.date_input.setDate(QDate.currentDate())
         else:
             self.date_input.setDate(QDate.currentDate())
+        self._refresh_char_place_choices()
+        want = set(ev.characters or [])
+        for i in range(self.char_list.count()):
+            item = self.char_list.item(i)
+            item.setSelected(item.text() in want)
+        idx = max(0, self.place_combo.findText(ev.place or ""))
+        self.place_combo.setCurrentIndex(idx)
+
+    def clear_form(self):
+        self.title_input.clear()
+        self.desc_input.clear()
+        self.date_input.setDate(QDate.currentDate())
+        self._refresh_char_place_choices()
+        for i in range(self.char_list.count()):
+            self.char_list.item(i).setSelected(False)
+        self.place_combo.setCurrentIndex(0)
+        self._edit_row = None
+        self.add_btn.setText("Add Event")
+
+
+    def load_for_edit(self, item: QListWidgetItem):
+        row = self.list.row(item)
+        payload = item.data(Qt.UserRole)
+        if isinstance(payload, dict):
+            ev = Event(
+                title=payload.get("title", ""),
+                description=payload.get("description", ""),
+                date=payload.get("date", ""),
+                characters=list(payload.get("characters", []) or []),
+                place=payload.get("place", "") or "",
+            )
+        else:
+            ev = self._parse_from_label(item.text())
         self._edit_row = row
         self.add_btn.setText("Save Changes")
+        self._fill_form(ev)
 
     def add_or_save(self):
         title = self.title_input.text().strip()
-        desc = self.desc_input.toPlainText().strip()
-        date = self.date_input.date().toString("yyyy-MM-dd")
         if not title:
             QMessageBox.warning(self, "Missing title", "Please enter a title for the event.")
             return
 
-        label = self._compose_label(date, title, desc)
+        ev = self._collect_form()
+        label = self._compose_label(ev)
+        payload = {
+            "title": ev.title, "description": ev.description, "date": ev.date,
+            "characters": ev.characters, "place": ev.place
+        }
 
         if self._edit_row is None:
-            self.list.addItem(QListWidgetItem(label))
+            item = QListWidgetItem(label)
+            item.setData(Qt.UserRole, payload)
+            self.list.addItem(item)
         else:
             item = self.list.item(self._edit_row)
             if item is not None:
                 item.setText(label)
+                item.setData(Qt.UserRole, payload)
 
         self.clear_form()
 
@@ -200,14 +255,34 @@ class EventsTab(QWidget):
             self.list.takeItem(self.list.row(item))
         self.clear_form()
 
+    def _parse_from_label(self, label: str) -> Event:
+        date = ""
+        rest = label
+        if " | " in label:
+            date, rest = label.split(" | ", 1)
+        title = rest
+        desc = ""
+        if " – " in rest:
+            title, desc = rest.split(" – ", 1)
+        return Event(title=title.strip(), description=desc.strip(), date=date.strip(), characters=[], place="")
+
     def values(self) -> List[Event]:
         """
-        Transformera rad-text tillbaka till Event-objekt.
-        Obs: beskrivningen som sparas är previewn vi har i listan (MVP).
+        Läs tillbaka full payload per rad (om finns),
+        annars fallback till parsing av label.
         """
         result: List[Event] = []
         for i in range(self.list.count()):
-            t = self.list.item(i).text()
-            date, title, desc = self._split_label(t)
-            result.append(Event(title=title, description=desc, date=date))
+            item = self.list.item(i)
+            payload = item.data(Qt.UserRole)
+            if isinstance(payload, dict):
+                result.append(Event(
+                    title=payload.get("title", ""),
+                    description=payload.get("description", ""),
+                    date=payload.get("date", ""),
+                    characters=list(payload.get("characters", []) or []),
+                    place=payload.get("place", "") or "",
+                ))
+            else:
+                result.append(self._parse_from_label(item.text()))
         return result
