@@ -1,37 +1,45 @@
 {
   "characters": [
     {
-      "name": "q"
+      "name": "fati"
     },
     {
-      "name": "w"
+      "name": "aseel"
     }
   ],
   "places": [
     {
-      "name": "råby"
+      "name": "här"
     },
     {
-      "name": "här"
+      "name": "där"
     }
   ],
   "events": [
     {
-      "title": "idag",
-      "description": "idag var jag här",
-      "date": "2025-09-22",
+      "title": "kärlek",
+      "description": "fati älskar aseel",
+      "date": "2025-09-23",
       "characters": [],
       "place": ""
     },
     {
-      "title": "idag",
-      "description": "rgrfgfgfgf",
-      "date": "2025-09-22",
+      "title": "saknad",
+      "description": "fati saknar aseel här",
+      "date": "2025-09-23",
       "characters": [
-        "q",
-        "w"
+        "fati"
       ],
       "place": "här"
+    },
+    {
+      "title": "jobba",
+      "description": "aseel jobbar mycket",
+      "date": "2025-09-27",
+      "characters": [
+        "aseel"
+      ],
+      "place": "där"
     }
   ]
 }
