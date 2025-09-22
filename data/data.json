@@ -1,5 +1,37 @@
 {
-  "characters": [],
-  "places": [],
-  "events": []
+  "characters": [
+    {
+      "name": "q"
+    },
+    {
+      "name": "w"
+    }
+  ],
+  "places": [
+    {
+      "name": "råby"
+    },
+    {
+      "name": "här"
+    }
+  ],
+  "events": [
+    {
+      "title": "idag",
+      "description": "idag var jag här",
+      "date": "2025-09-22",
+      "characters": [],
+      "place": ""
+    },
+    {
+      "title": "idag",
+      "description": "rgrfgfgfgf",
+      "date": "2025-09-22",
+      "characters": [
+        "q",
+        "w"
+      ],
+      "place": "här"
+    }
+  ]
 }

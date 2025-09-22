@@ -6,12 +6,13 @@ from .models import Character, Place, Event
 from .storage import load_state, save_state
 from .ui.tabs import ListTab, EventsTab
 from .ui.timeline import TimelineTab
+from .ui.timeline_graph import TimelineGraphTab  # <-- NY
 
 class MainWindow(QWidget):
     def __init__(self):
         super().__init__()
-        self.setWindowTitle("timeline – MVP with Timeline & Links")
-        self.resize(1000, 650)
+        self.setWindowTitle("timeline – MVP with Graph Timeline")
+        self.resize(1100, 720)
 
         state = load_state()
         char_names = [c["name"] for c in state.get("characters", [])]
@@ -27,11 +28,13 @@ class MainWindow(QWidget):
 
         self.events_tab = EventsTab(events, get_characters_fn=get_chars, get_places_fn=get_places)
         self.timeline_tab = TimelineTab(self.events_tab.values, get_characters_fn=get_chars, get_places_fn=get_places)
+        self.timeline_graph_tab = TimelineGraphTab(self.events_tab.values, get_characters_fn=get_chars, get_places_fn=get_places)
 
         self.tabs.addTab(self.chars_tab, "Characters")
         self.tabs.addTab(self.places_tab, "Places")
         self.tabs.addTab(self.events_tab, "Events")
         self.tabs.addTab(self.timeline_tab, "Timeline")
+        self.tabs.addTab(self.timeline_graph_tab, "Timeline (Graph)")
 
         layout = QVBoxLayout(self)
         layout.addWidget(self.tabs)
