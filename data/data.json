@@ -1,5 +1,39 @@
 {
-  "characters": [],
-  "places": [],
-  "events": []
+  "characters": [
+    {
+      "name": "maram"
+    },
+    {
+      "name": "fati"
+    }
+  ],
+  "places": [
+    {
+      "name": "bth"
+    },
+    {
+      "name": "hemma"
+    }
+  ],
+  "events": [
+    {
+      "title": "pluggar",
+      "description": "jag och maram pluggar i bth",
+      "date": "2025-09-05",
+      "characters": [
+        "maram",
+        "fati"
+      ],
+      "place": "bth"
+    },
+    {
+      "title": "ensam",
+      "description": "fati är ensam hemma",
+      "date": "2025-10-26",
+      "characters": [
+        "fati"
+      ],
+      "place": "hemma"
+    }
+  ]
 }
