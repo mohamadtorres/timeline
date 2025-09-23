@@ -6,7 +6,7 @@ from .models import Character, Place, Event
 from .storage import load_state, save_state
 from .ui.tabs import ListTab, EventsTab
 from .ui.timeline import TimelineTab
-from .ui.timeline_graph import TimelineGraphTab  # <-- NY
+from .ui.timeline_graph import TimelineGraphTab
 
 class MainWindow(QWidget):
     def __init__(self):

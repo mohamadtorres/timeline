@@ -1,45 +1,5 @@
 {
-  "characters": [
-    {
-      "name": "fati"
-    },
-    {
-      "name": "aseel"
-    }
-  ],
-  "places": [
-    {
-      "name": "här"
-    },
-    {
-      "name": "där"
-    }
-  ],
-  "events": [
-    {
-      "title": "kärlek",
-      "description": "fati älskar aseel",
-      "date": "2025-09-23",
-      "characters": [],
-      "place": ""
-    },
-    {
-      "title": "saknad",
-      "description": "fati saknar aseel här",
-      "date": "2025-09-23",
-      "characters": [
-        "fati"
-      ],
-      "place": "här"
-    },
-    {
-      "title": "jobba",
-      "description": "aseel jobbar mycket",
-      "date": "2025-09-27",
-      "characters": [
-        "aseel"
-      ],
-      "place": "där"
-    }
-  ]
+  "characters": [],
+  "places": [],
+  "events": []
 }
