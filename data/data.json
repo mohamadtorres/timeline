@@ -1,13 +1,10 @@
 {
-  "name": "Skolan",
   "characters": [
     {
-      "name": "fati",
-      "color": "#ff80ff"
+      "name": "fatema"
     },
     {
-      "name": "sedra",
-      "color": "#ffff80"
+      "name": "mikael"
     }
   ],
   "places": [
@@ -15,14 +12,14 @@
       "name": "bth"
     },
     {
-      "name": "hemma"
+      "name": "karlskrona"
     }
   ],
   "events": [
     {
-      "title": "projekt",
-      "description": "vi jobbar med projektet",
-      "date": "2025-09-24"
+      "title": "demo1",
+      "description": "mikael kollar fatemas projekt",
+      "date": "2025-09-26"
     }
   ]
 }
