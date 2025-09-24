@@ -1,10 +1,13 @@
 {
+  "name": "Skolan",
   "characters": [
     {
-      "name": "maram"
+      "name": "fati",
+      "color": "#ff80ff"
     },
     {
-      "name": "fati"
+      "name": "sedra",
+      "color": "#ffff80"
     }
   ],
   "places": [
@@ -17,23 +20,9 @@
   ],
   "events": [
     {
-      "title": "pluggar",
-      "description": "jag och maram pluggar i bth",
-      "date": "2025-09-05",
-      "characters": [
-        "maram",
-        "fati"
-      ],
-      "place": "bth"
-    },
-    {
-      "title": "ensam",
-      "description": "fati är ensam hemma",
-      "date": "2025-10-26",
-      "characters": [
-        "fati"
-      ],
-      "place": "hemma"
+      "title": "projekt",
+      "description": "vi jobbar med projektet",
+      "date": "2025-09-24"
     }
   ]
 }
