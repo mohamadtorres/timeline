@@ -1,25 +1,5 @@
 {
-  "characters": [
-    {
-      "name": "fatema"
-    },
-    {
-      "name": "mikael"
-    }
-  ],
-  "places": [
-    {
-      "name": "bth"
-    },
-    {
-      "name": "karlskrona"
-    }
-  ],
-  "events": [
-    {
-      "title": "demo1",
-      "description": "mikael kollar fatemas projekt",
-      "date": "2025-09-26"
-    }
-  ]
+  "characters": [],
+  "places": [],
+  "events": []
 }
