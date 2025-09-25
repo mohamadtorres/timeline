@@ -1,5 +1,25 @@
 {
-  "characters": [],
-  "places": [],
-  "events": []
+  "characters": [
+    {
+      "name": "mikael"
+    },
+    {
+      "name": "fatema"
+    }
+  ],
+  "places": [
+    {
+      "name": "bth"
+    },
+    {
+      "name": "karlskrona"
+    }
+  ],
+  "events": [
+    {
+      "title": "demo 1",
+      "description": "presenterar projektet",
+      "date": "2025-09-26"
+    }
+  ]
 }

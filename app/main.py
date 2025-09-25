@@ -22,7 +22,6 @@ class MainWindow(QWidget):
         self.chars_tab = ListTab("Character", char_names)
         self.places_tab = ListTab("Place", place_names)
         self.events_tab = EventsTab(events)
-        # Timeline läser events från events_tab.on-demand
         self.timeline_tab = TimelineTab(self.events_tab.values)
 
         self.tabs.addTab(self.chars_tab, "Characters")
@@ -33,7 +32,7 @@ class MainWindow(QWidget):
         layout = QVBoxLayout(self)
         layout.addWidget(self.tabs)
 
-    def closeEvent(self, event):  # type: ignore[override]
+    def closeEvent(self, event):
         state = {
             "characters": [asdict(Character(name=n)) for n in self.chars_tab.values()],
             "places": [asdict(Place(name=n)) for n in self.places_tab.values()],

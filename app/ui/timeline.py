@@ -4,7 +4,6 @@ from PySide6.QtWidgets import QWidget, QVBoxLayout, QTableWidget, QTableWidgetIt
 from ..models import Event
 
 def _date_key(s: str) -> str:
-    # Tomma datum hamnar sist
     return s if s else "9999-99-99"
 
 class TimelineTab(QWidget):
@@ -20,7 +19,7 @@ class TimelineTab(QWidget):
         self.table.horizontalHeader().setStretchLastSection(True)
 
         self.refresh_btn = QPushButton("Refresh")
-        self.refresh_btn.clicked.connect(self.refresh)  # type: ignore
+        self.refresh_btn.clicked.connect(self.refresh)
 
         top = QHBoxLayout()
         top.addStretch(1)

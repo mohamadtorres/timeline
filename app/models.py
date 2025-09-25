@@ -12,4 +12,4 @@ class Place:
 class Event:
     title: str
     description: str
-    date: str = ""   # ISO "YYYY-MM-DD" (kan vara tomt)
+    date: str = ""

@@ -13,7 +13,6 @@ def load_state() -> Dict[str, List[Dict[str, Any]]]:
     if DATA_FILE.exists():
         try:
             state = json.loads(DATA_FILE.read_text(encoding="utf-8"))
-            # Backfill: se till att event har 'date'
             evs = state.get("events", [])
             for e in evs:
                 if "date" not in e:

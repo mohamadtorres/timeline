@@ -28,8 +28,8 @@ class ListTab(QWidget):
         add_btn = QPushButton(f"Add {label_singular}")
         del_btn = QPushButton("Delete selected")
 
-        add_btn.clicked.connect(self.add_item)        # type: ignore
-        del_btn.clicked.connect(self.delete_selected) # type: ignore
+        add_btn.clicked.connect(self.add_item)
+        del_btn.clicked.connect(self.delete_selected)
 
         top = QHBoxLayout()
         top.addWidget(self.input)
@@ -80,14 +80,14 @@ class EventsTab(QWidget):
 
         self.date_input = QDateEdit()
         self.date_input.setCalendarPopup(True)
-        self.date_input.setDate(QDate.currentDate())  # default: idag
+        self.date_input.setDate(QDate.currentDate())
         self.date_input.setDisplayFormat("yyyy-MM-dd")
 
         add_btn = QPushButton("Add Event")
         del_btn = QPushButton("Delete selected")
 
-        add_btn.clicked.connect(self.add_event)        # type: ignore
-        del_btn.clicked.connect(self.delete_selected)  # type: ignore
+        add_btn.clicked.connect(self.add_event)
+        del_btn.clicked.connect(self.delete_selected)
 
         form = QVBoxLayout()
         form.addWidget(QLabel("Title"))
@@ -128,7 +128,6 @@ class EventsTab(QWidget):
         result: List[Event] = []
         for i in range(self.list.count()):
             t = self.list.item(i).text()
-            # Format: "YYYY-MM-DD | Title – Desc" (date kan saknas)
             date = ""
             title_desc = t
             if " | " in t:
