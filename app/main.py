@@ -22,7 +22,7 @@ class MainWindow(QWidget):
         self.chars_tab = CharactersTab(characters)
         self.places_tab = PlacesTab([Place(**p) if not isinstance(p, Place) else p for p in state.get("places", [])])
         self.events_tab = EventsTab(events, characters=characters, places=self.places_tab.values())
-        self.timeline_tab = TimelineTab(self.events_tab.values)
+        self.timeline_tab = TimelineTab(self.events_tab.values, self.chars_tab.values)
 
         # to sync data between tabs
         self.chars_tab.data_changed.connect(self._update_events_characters)
