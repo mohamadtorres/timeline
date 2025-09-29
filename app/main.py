@@ -4,7 +4,7 @@ from PySide6.QtWidgets import QApplication, QWidget, QTabWidget, QVBoxLayout, QM
 
 from .models import Character, Place, Event
 from .storage import load_state, save_state
-from .ui.tabs import CharactersTab, ListTab, EventsTab
+from .ui.tabs import CharactersTab, EventsTab, PlacesTab
 from .ui.timeline import TimelineTab
 
 class MainWindow(QWidget):
@@ -20,8 +20,8 @@ class MainWindow(QWidget):
 
         self.tabs = QTabWidget()
         self.chars_tab = CharactersTab(characters)
-        self.places_tab = ListTab("Place", place_names)
-        self.events_tab = EventsTab(events)
+        self.places_tab = PlacesTab([Place(**p) if not isinstance(p, Place) else p for p in state.get("places", [])])
+        self.events_tab = EventsTab(events, characters=characters, places=self.places_tab.values())
         self.timeline_tab = TimelineTab(self.events_tab.values)
 
         self.tabs.addTab(self.chars_tab, "Characters")
@@ -35,7 +35,7 @@ class MainWindow(QWidget):
     def closeEvent(self, event):
         state = {
             "characters": [asdict(c) for c in self.chars_tab.values()],
-            "places": [ {"name": n} for n in self.places_tab.values() ],
+            "places": [asdict(p) for p in self.places_tab.values()],
             "events": [asdict(e) for e in self.events_tab.values()],
         }
         try:
