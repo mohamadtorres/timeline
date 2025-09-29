@@ -4,7 +4,7 @@ from PySide6.QtWidgets import QApplication, QWidget, QTabWidget, QVBoxLayout, QM
 
 from .models import Character, Place, Event
 from .storage import load_state, save_state
-from .ui.tabs import ListTab, EventsTab
+from .ui.tabs import CharactersTab, ListTab, EventsTab
 from .ui.timeline import TimelineTab
 
 class MainWindow(QWidget):
@@ -14,12 +14,12 @@ class MainWindow(QWidget):
         self.resize(900, 600)
 
         state = load_state()
-        char_names = [c["name"] for c in state.get("characters", [])]
+        characters = [Character(**c) for c in state.get("characters", [])]
         place_names = [p["name"] for p in state.get("places", [])]
         events = [Event(**e) for e in state.get("events", [])]
 
         self.tabs = QTabWidget()
-        self.chars_tab = ListTab("Character", char_names)
+        self.chars_tab = CharactersTab(characters)
         self.places_tab = ListTab("Place", place_names)
         self.events_tab = EventsTab(events)
         self.timeline_tab = TimelineTab(self.events_tab.values)
@@ -34,8 +34,8 @@ class MainWindow(QWidget):
 
     def closeEvent(self, event):
         state = {
-            "characters": [asdict(Character(name=n)) for n in self.chars_tab.values()],
-            "places": [asdict(Place(name=n)) for n in self.places_tab.values()],
+            "characters": [asdict(c) for c in self.chars_tab.values()],
+            "places": [ {"name": n} for n in self.places_tab.values() ],
             "events": [asdict(e) for e in self.events_tab.values()],
         }
         try:
