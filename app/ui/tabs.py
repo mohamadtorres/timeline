@@ -2,8 +2,8 @@ from __future__ import annotations
 from dataclasses import asdict
 from typing import List
 import os
-from PySide6.QtCore import Qt,QDate
-from PySide6.QtGui import QColor, QPixmap
+from PySide6.QtCore import Qt,QDate, Signal
+from PySide6.QtGui import QColor, QPixmap, QIcon
 from PySide6.QtWidgets import (
     QWidget, QVBoxLayout, QHBoxLayout, QListWidget, QListWidgetItem,
     QLineEdit, QTextEdit, QPushButton, QLabel, QMessageBox, QColorDialog,
@@ -11,15 +11,25 @@ from PySide6.QtWidgets import (
 )
 from ..models import Character, Place, Event
 
-
 def _shorten(text: str, max_len: int = 60) -> str:
     text = (text or "").replace("\n", " ")
     return text if len(text) <= max_len else text[: max_len - 1] + "…"
+
+def _add_image_item(images_list, img_path):
+    full_path = os.path.join(os.getcwd(), img_path)
+    item = QListWidgetItem(os.path.basename(img_path))
+    if os.path.exists(full_path):
+        icon = QIcon(full_path)
+        item.setIcon(icon)
+    item.setToolTip(img_path)
+    images_list.addItem(item)
 
 class CharactersTab(QWidget):
     """
     A full-featured characters tab: select a character and edit all fields.
     """
+    data_changed = Signal()
+
     def __init__(self, initial_chars: List[Character]):
         super().__init__()
         self.chars: List[Character] = [Character(**asdict(c)) if not isinstance(c, Character) else c for c in initial_chars]
@@ -96,8 +106,7 @@ class CharactersTab(QWidget):
             self.texts_list.addItem(QListWidgetItem(t))
         self.images_list.clear()
         for img in c.images:
-            item = QListWidgetItem(img)
-            self.images_list.addItem(item)
+            _add_image_item(self.images_list, img)
 
     def _save_current(self):
         row = self.list.currentRow()
@@ -117,8 +126,9 @@ class CharactersTab(QWidget):
         c.description = self.desc_edit.toPlainText()
         c.color = self.color_btn.text()
         c.texts = [self.texts_list.item(i).text() for i in range(self.texts_list.count())]
-        c.images = [self.images_list.item(i).text() for i in range(self.images_list.count())]
+        c.images = [self.images_list.item(i).toolTip() for i in range(self.images_list.count())]
         self.list.item(row).setText(c.name)
+        self.data_changed.emit()
 
     def _clear_details(self):
         self.name_edit.clear()
@@ -139,6 +149,7 @@ class CharactersTab(QWidget):
         self.chars.append(c)
         self.list.addItem(QListWidgetItem(c.name))
         self.list.setCurrentRow(self.list.count() - 1)
+        self.data_changed.emit()
 
     def _delete_selected(self):
         row = self.list.currentRow()
@@ -147,6 +158,7 @@ class CharactersTab(QWidget):
         self.chars.pop(row)
         self.list.takeItem(row)
         self.list.setCurrentRow(0 if self.chars else -1)
+        self.data_changed.emit()
 
     def _pick_color(self):
         color = QColorDialog.getColor()
@@ -173,21 +185,24 @@ class CharactersTab(QWidget):
             if not rel.startswith("pictures/") and not rel.startswith("pictures\\"):
                 QMessageBox.warning(self, "Not in pictures/", "Please only add images from the 'pictures/' folder.")
                 return
-            self.images_list.addItem(QListWidgetItem(rel))
+            _add_image_item(self.images_list, rel)
+            self.data_changed.emit()
 
     def _del_img(self):
         for item in self.images_list.selectedItems():
             self.images_list.takeItem(self.images_list.row(item))
+        self.data_changed.emit()
 
     def values(self) -> List[Character]:
         self._save_current()
         return self.chars
 
-
 class PlacesTab(QWidget):
     """
     A full-featured places tab: select a place and edit all fields.
     """
+    data_changed = Signal()
+
     def __init__(self, initial_places: List[Place]):
         super().__init__()
         self.places: List[Place] = [Place(**asdict(p)) if not isinstance(p, Place) else p for p in initial_places]
@@ -257,8 +272,7 @@ class PlacesTab(QWidget):
             self.texts_list.addItem(QListWidgetItem(t))
         self.images_list.clear()
         for img in p.images:
-            item = QListWidgetItem(img)
-            self.images_list.addItem(item)
+            _add_image_item(self.images_list, img)
 
     def _save_current(self):
         row = self.list.currentRow()
@@ -277,8 +291,9 @@ class PlacesTab(QWidget):
         p.name = name
         p.description = self.desc_edit.toPlainText()
         p.texts = [self.texts_list.item(i).text() for i in range(self.texts_list.count())]
-        p.images = [self.images_list.item(i).text() for i in range(self.images_list.count())]
+        p.images = [self.images_list.item(i).toolTip() for i in range(self.images_list.count())]
         self.list.item(row).setText(p.name)
+        self.data_changed.emit()
 
     def _clear_details(self):
         self.name_edit.clear()
@@ -297,6 +312,7 @@ class PlacesTab(QWidget):
         self.places.append(p)
         self.list.addItem(QListWidgetItem(p.name))
         self.list.setCurrentRow(self.list.count() - 1)
+        self.data_changed.emit()
 
     def _delete_selected(self):
         row = self.list.currentRow()
@@ -305,6 +321,7 @@ class PlacesTab(QWidget):
         self.places.pop(row)
         self.list.takeItem(row)
         self.list.setCurrentRow(0 if self.places else -1)
+        self.data_changed.emit()
 
     def _add_text(self):
         text, ok = QInputDialog.getMultiLineText(self, "Add Note", "Text:")
@@ -325,16 +342,20 @@ class PlacesTab(QWidget):
             if not rel.startswith("pictures/") and not rel.startswith("pictures\\"):
                 QMessageBox.warning(self, "Not in pictures/", "Please only add images from the 'pictures/' folder.")
                 return
-            self.images_list.addItem(QListWidgetItem(rel))
+            _add_image_item(self.images_list, rel)
+            self.data_changed.emit()
 
     def _del_img(self):
         for item in self.images_list.selectedItems():
             self.images_list.takeItem(self.images_list.row(item))
+        self.data_changed.emit()
 
     def values(self) -> List[Place]:
         # Save current edit if any
         self._save_current()
         return self.places
+
+# ListTab and EventsTab remain unchanged except for EventsTab _on_select/_add_img/_del_img using _add_image_item if you want thumbnails for Events as well.
 
 class ListTab(QWidget):
     """Generic list tab for Characters and Places."""

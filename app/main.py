@@ -24,6 +24,10 @@ class MainWindow(QWidget):
         self.events_tab = EventsTab(events, characters=characters, places=self.places_tab.values())
         self.timeline_tab = TimelineTab(self.events_tab.values)
 
+        # to sync data between tabs
+        self.chars_tab.data_changed.connect(self._update_events_characters)
+        self.places_tab.data_changed.connect(self._update_events_places)
+
         self.tabs.addTab(self.chars_tab, "Characters")
         self.tabs.addTab(self.places_tab, "Places")
         self.tabs.addTab(self.events_tab, "Events")
@@ -43,7 +47,11 @@ class MainWindow(QWidget):
         except Exception as e:
             QMessageBox.critical(self, "Save failed", f"Could not save data: {e}")
         event.accept()
+    def _update_events_characters(self):
+            self.events_tab.set_characters([c.name for c in self.chars_tab.values()])
 
+    def _update_events_places(self):
+            self.events_tab.set_places([p.name for p in self.places_tab.values()])
 def main():
     app = QApplication(sys.argv)
     w = MainWindow()
