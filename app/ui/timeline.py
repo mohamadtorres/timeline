@@ -1,7 +1,7 @@
 from __future__ import annotations
 from typing import List, Dict, Tuple
 from PySide6.QtWidgets import QWidget, QVBoxLayout, QGraphicsView, QGraphicsScene, QLabel, QHBoxLayout, QPushButton
-from PySide6.QtGui import QColor, QPen, QBrush, QFont
+from PySide6.QtGui import QColor, QPen, QBrush, QFont, QPainter
 from PySide6.QtCore import Qt, QRectF
 from ..models import Event, Character
 
@@ -25,7 +25,7 @@ class TimelineGraphWidget(QGraphicsView):
         self.get_events_fn = get_events_fn
         self.get_characters_fn = get_characters_fn
         self.setScene(QGraphicsScene(self))
-        self.setRenderHint(self.RenderHint.Antialiasing)
+        self.setRenderHint(QPainter.Antialiasing)
         self.setMinimumHeight(350)
         self.setMinimumWidth(800)
         self._font = QFont()

@@ -1,25 +1,44 @@
 {
   "characters": [
     {
-      "name": "mikael"
+      "name": "mikael",
+      "description": "",
+      "color": "#cccccc",
+      "texts": [],
+      "images": []
     },
     {
-      "name": "fatema"
+      "name": "fatema",
+      "description": "",
+      "color": "#cccccc",
+      "texts": [],
+      "images": []
     }
   ],
   "places": [
     {
-      "name": "bth"
+      "name": "bth",
+      "description": "",
+      "texts": [],
+      "images": []
     },
     {
-      "name": "karlskrona"
+      "name": "karlskrona",
+      "description": "",
+      "texts": [],
+      "images": []
     }
   ],
   "events": [
     {
       "title": "demo 1",
       "description": "presenterar projektet",
-      "date": "2025-09-26"
+      "start_date": "2025-09-26",
+      "end_date": "2025-09-29",
+      "texts": [],
+      "images": [],
+      "characters": [],
+      "places": []
     }
   ]
 }

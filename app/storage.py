@@ -48,6 +48,7 @@ def _patch_event(e: Dict[str, Any]) -> Dict[str, Any]:
     # Support old 'date' field as 'start_date'
     if "start_date" not in e and "date" in e:
         e["start_date"] = e["date"]
+        del e["date"]  # Remove the legacy field so Event(**e) works
     for k, v in DEFAULT_EVENT.items():
         if k not in e:
             e[k] = v

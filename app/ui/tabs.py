@@ -7,7 +7,8 @@ from PySide6.QtGui import QColor, QPixmap, QIcon
 from PySide6.QtWidgets import (
     QWidget, QVBoxLayout, QHBoxLayout, QListWidget, QListWidgetItem,
     QLineEdit, QTextEdit, QPushButton, QLabel, QMessageBox, QColorDialog,
-    QFileDialog, QListView, QListWidget, QListWidgetItem, QInputDialog, QDialog, QDialogButtonBox, QGridLayout
+    QFileDialog, QListView, QInputDialog, QDialog, QDialogButtonBox, QGridLayout,
+    QDateEdit
 )
 from ..models import Character, Place, Event
 
